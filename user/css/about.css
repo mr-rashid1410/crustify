@@ -140,3 +140,38 @@
   .about-cards { padding: 20px 24px 50px; }
   .about-banner { margin: 0 24px 50px; padding: 34px 24px; }
 }
+
+/* The hero is 520px + 560px + 160px of padding = 1240px wide, so
+   anything under that overflowed before the 900px stack kicked in. */
+@media (max-width: 1240px) {
+  .about-hero { padding: 56px 40px 26px; }
+  .about-left { max-width: 420px; }
+  .about-left h1 { font-size: 44px; }
+  .about-right img { width: 460px; }
+  .about-cards { padding: 26px 40px 66px; }
+  .about-banner { margin: 0 40px 60px; padding: 44px 34px; }
+}
+
+@media (max-width: 560px) {
+  .about-hero { padding: 34px 18px 0; }
+  .about-left h1 { font-size: clamp(28px, 8vw, 36px); }
+  .about-left p { font-size: 15px; }
+  .about-right img { width: 100%; }
+
+  /* One column instead of auto-fit's 260px minimum squeezing */
+  .about-cards { grid-template-columns: 1fr; padding: 20px 16px 46px; }
+  .card { padding: 24px 20px; }
+  .card h3 { font-size: 19px; }
+  .card p { font-size: 14px; }
+
+  .about-banner { margin: 0 16px 46px; padding: 30px 20px; }
+  .about-banner h2 { font-size: 23px; }
+  .about-banner span { font-size: 14px; }
+}
+
+@media (max-width: 400px) {
+  .about-hero { padding: 28px 14px 0; }
+  .about-cards { padding: 16px 12px 38px; }
+  .about-banner { margin: 0 12px 38px; padding: 26px 16px; }
+  .about-banner h2 { font-size: 21px; }
+}

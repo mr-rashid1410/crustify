@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>My Profile | Crustify</title>
   <link rel="stylesheet" href="../css/home.css">
   <link rel="stylesheet" href="../css/auth.css">
@@ -156,9 +157,41 @@
       margin-top: 10px;
       min-height: 18px;
     }
-    .save-msg.ok  { color: #2ecc71; }
-    .save-msg.err { color: #ff6b6b; }
-  </style>
+.save-msg.ok  { color: #2ecc71; }
+      .save-msg.err { color: #ff6b6b; }
+
+      /* ── Responsive ─────────────────────────────────────────────── */
+      @media (max-width: 560px) {
+        .profile-section {
+          margin: 32px auto 50px;
+          padding: 0 14px;
+        }
+        .profile-card { padding: 22px 18px; border-radius: 14px; }
+
+        /* Let the heading actions wrap under the title rather than
+           squeezing four buttons into one narrow row. */
+        .card-heading { flex-wrap: wrap; gap: 10px; }
+        .head-btn, .logout-inline { padding: 9px 14px; }
+
+        /* Stack the label above the value on narrow screens */
+        .info-row { flex-direction: column; align-items: flex-start; gap: 3px; }
+        .info-label { width: auto; }
+        .info-value { font-size: 14px; word-break: break-word; }
+
+        .edit-form input { padding: 13px 14px; font-size: 16px; }  /* 16px stops iOS zoom */
+        .order-row { padding: 14px 15px; }
+        .order-total { font-size: 15px; }
+      }
+
+      @media (max-width: 400px) {
+        .profile-card { padding: 18px 14px; }
+        .card-heading h2 { font-size: 17px; }
+        .head-btn, .logout-inline { padding: 10px 12px; font-size: 12px; }
+        .btn-cancel-head { margin-right: 4px; }
+        .order-row h4 { font-size: 14px; }
+        .order-total { font-size: 14px; }
+      }
+    </style>
 </head>
 <body>
 

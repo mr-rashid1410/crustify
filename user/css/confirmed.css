@@ -162,3 +162,22 @@
   .details { flex-direction: column; }
   .summary, .address { width: 100%; }
 }
+
+@media (max-width: 560px) {
+  .confirm-container { padding: 0 16px; }
+  .check { width: 56px; height: 56px; font-size: 27px; }
+  .success h1 { font-size: clamp(22px, 6.5vw, 28px); }
+  .success p { font-size: 14px; }
+  .summary, .address { padding: 20px 18px; }
+  .summary h2, .address h2 { font-size: 18px; }
+
+  /* Name + price on separate rows so neither gets truncated */
+  .item { flex-wrap: wrap; }
+  .item span:last-child { margin-left: auto; }
+}
+
+@media (max-width: 400px) {
+  .confirm-container { padding: 0 12px; }
+  .summary, .address { padding: 18px 14px; }
+  .totals p { font-size: 13px; }
+}

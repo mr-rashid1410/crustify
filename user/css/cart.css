@@ -269,6 +269,9 @@
   box-shadow: 0 12px 26px var(--accent-glow);
 }
 
+/* ── Responsive ──────────────────────────────────────────────────────
+   ≤900px the 4-column grid collapses: the header row is dropped and
+   each line item becomes a stacked card. */
 @media (max-width: 900px) {
   .cart-section { padding: 40px 20px 60px; }
   .cart-section h1 { font-size: 30px; }
@@ -279,4 +282,34 @@
   .line-total { text-align: left; }
   .remove { text-align: left; }
   .cart-total-box { max-width: 100%; }
+}
+
+/* Tablet portrait: keep the totals box beside the list, not under it,
+   but stop it stretching to a full 1100px on wide-but-short screens. */
+@media (max-width: 1200px) {
+  .cart-total-box { max-width: 420px; }
+}
+
+@media (max-width: 560px) {
+  .cart-section { padding: 28px 14px 46px; }
+  .cart-section h1 { font-size: clamp(24px, 7vw, 30px); }
+
+  /* Stack product image above its text so long names don't squeeze
+     the thumbnail into a sliver. */
+  .cart-item { grid-template-columns: 1fr; }
+  .product { grid-template-columns: 64px 1fr; gap: 12px; }
+  .product img { width: 64px; height: 64px; }
+  .qty { justify-content: space-between; }
+  .line-total { text-align: right; }
+
+  .cart-total-box { padding: 20px 18px; }
+  .cart-total-box h2 { font-size: 22px; }
+  .cart-empty { padding: 40px 18px; }
+}
+
+@media (max-width: 400px) {
+  .cart-item { gap: 12px; }
+  .cart-total-box p { font-size: 13px; }
+  /* Full-size tap targets instead of a cramped row */
+  .qty button { width: 34px; height: 34px; }
 }

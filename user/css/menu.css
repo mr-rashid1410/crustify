@@ -195,8 +195,31 @@
   padding: 40px;
 }
 
+/* ── Responsive ──────────────────────────────────────────────────────
+   The grid steps down 3 -> 2 -> 1. Previously it jumped straight from
+   3 to 1 at 900px, which left tablets in the phone layout. */
+@media (max-width: 1100px) {
+  .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 22px; }
+}
+
 @media (max-width: 900px) {
   .menu { padding: 40px 20px 60px; }
   .menu h1 { font-size: 32px; }
+}
+
+@media (max-width: 700px) {
   .menu-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .menu { padding: 30px 16px 46px; }
+  .menu h1 { font-size: clamp(24px, 7vw, 30px); }
+
+  /* Filter chips wrap instead of overflowing off-screen */
+  .category-filter { gap: 8px; }
+  .filter-chip { padding: 8px 14px; font-size: 13px; }
+}
+
+@media (max-width: 400px) {
+  .menu-grid { gap: 16px; }
 }

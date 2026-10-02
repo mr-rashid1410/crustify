@@ -339,16 +339,7 @@ body {
   font-size: 17px;
 }
 
-@media (max-width: 900px) {
-  .header { padding: 0 20px; }
-  .nav a { margin-left: 16px; font-size: 14px; }
-  .hero { flex-direction: column; padding: 40px 24px; text-align: center; }
-  .hero-text { max-width: 100%; }
-  .hero-text h1 { font-size: 42px; }
-  .hero-image img { width: 100%; max-width: 420px; }
-  .hero-actions, .hero-stats { justify-content: center; }
-  .feature-strip { padding: 0 24px 50px; }
-}
+/* (the 900px breakpoint lives in the RESPONSIVE block at the end of this file) */
 
 #cartCount {
   background: var(--accent);
@@ -357,4 +348,171 @@ body {
   border-radius: 50%;
   font-size: 12px;
   margin-left: 5px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   home.css is loaded by every user page, so the shell (header, nav,
+   shared section rhythm) is handled here. Page-specific grids live in
+   their own stylesheets.
+
+   Breakpoints used across the app:
+     1200px  tighten wide gutters, 3-col grids -> 2
+      900px  stack side-by-side sections (pre-existing)
+      768px  hamburger nav, single-column layouts
+      560px  compact gutters and type
+      400px  small phones
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Hamburger + backdrop (hidden on desktop) ────────────────────── */
+.nav-toggle {
+  display: none;                 /* desktop keeps the inline nav */
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 42px;
+  height: 42px;
+  padding: 0 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.nav-toggle .bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--text);
+  transition: transform 0.25s, opacity 0.2s;
+}
+
+/* Animate the three bars into an X while .nav-open is set */
+.nav-open .nav-toggle .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-open .nav-toggle .bar:nth-child(2) { opacity: 0; }
+.nav-open .nav-toggle .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.nav-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 150;
+}
+
+.nav-backdrop[hidden] { display: none; }
+
+/* ── 1200px: tighten the gutters ─────────────────────────────────── */
+@media (max-width: 1200px) {
+  .header { padding: 0 32px; }
+}
+
+/* ── 900px: stack hero / feature sections ────────────────────────── */
+@media (max-width: 900px) {
+  .header { padding: 0 20px; }
+  .nav a { margin-left: 16px; font-size: 14px; }
+  .hero { flex-direction: column; padding: 40px 24px; text-align: center; }
+  .hero-text { max-width: 100%; }
+  .hero-text h1 { font-size: clamp(32px, 8vw, 42px); }
+  .hero-image img { width: 100%; max-width: 420px; }
+  .hero-actions, .hero-stats { justify-content: center; }
+  .feature-strip { padding: 0 24px 50px; }
+  .section-heading h2 { font-size: clamp(26px, 5.5vw, 34px); }
+}
+
+/* ── 768px: hamburger nav ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .header {
+    height: 66px;
+    padding: 0 16px;
+  }
+
+  .nav-toggle { display: flex; }
+
+  /* Panel: drop the inline row and float the links in a sheet */
+  .nav {
+    position: fixed;
+    top: 66px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px 16px 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.45);
+
+    /* hidden until .nav-open */
+    display: flex;
+    transform: translateY(-12px);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.22s ease, opacity 0.22s ease, visibility 0.22s;
+    max-height: calc(100vh - 66px);
+    overflow-y: auto;
+  }
+
+  .nav-open .nav {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .nav a,
+  .nav #authLink a {
+    display: block;
+    margin: 0;
+    padding: 13px 4px;
+    font-size: 16px;
+    border-bottom: 1px solid var(--border-soft);
+    border-radius: 0;
+  }
+
+  .nav a:last-child { border-bottom: none; }
+
+  /* Backdrop only exists on mobile */
+  .nav-open .nav-backdrop:not([hidden]) { display: block; }
+
+  .hero { padding: 32px 18px; }
+  .hero-actions { flex-direction: column; align-items: stretch; width: 100%; }
+  .hero-stats { flex-wrap: wrap; gap: 18px; }
+}
+
+/* ── 560px: compact gutters and type ─────────────────────────────── */
+@media (max-width: 560px) {
+  .header { padding: 0 14px; }
+  .logo-text { font-size: 20px; }
+
+  .hero { padding: 28px 16px 34px; }
+  .hero-text h1 { font-size: clamp(28px, 9vw, 38px); }
+  .hero-text p { font-size: 15px; }
+  .hero-image img { max-width: 320px; }
+
+  .feature-strip { padding: 0 16px 40px; }
+  .section-heading { padding: 0 16px; }
+  .section-heading h2 { font-size: clamp(23px, 7vw, 30px); }
+  .section-heading p { font-size: 15px; }
+}
+
+/* ── 400px: small phones ─────────────────────────────────────────── */
+@media (max-width: 400px) {
+  .hero-text h1 { font-size: clamp(25px, 9.5vw, 32px); }
+  .hero-actions .btn { width: 100%; }
+  .hero-stats { gap: 14px; }
+}
+
+/* ── Touch devices: kill hover states that stick after a tap ─────── */
+@media (hover: none) {
+  .nav a:hover,
+  .card:hover,
+  .feature-card:hover { transform: none; }
+}
+
+/* ── Respect users who ask for less motion ───────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .nav,
+  .nav-toggle .bar,
+  .cart-item { transition: none !important; animation: none !important; }
 }

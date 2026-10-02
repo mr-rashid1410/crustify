@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Enquiries | Crustify Admin</title>
   <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -26,8 +27,15 @@
     </div>
   </aside>
 
+  <!-- Tap outside to dismiss the drawer on small screens -->
+  <div class="sidebar-backdrop" hidden></div>
+
   <!-- Main -->
   <main class="main">
+    <!-- Drawer trigger: hidden on desktop, shown below 992px -->
+    <button class="sidebar-toggle" aria-label="Open navigation menu" aria-expanded="false">
+      <span class="icon" aria-hidden="true">&#9776;</span> Menu
+    </button>
     <h1 class="page-title">Contact Enquiries</h1>
     <p class="page-subtitle">Messages submitted through the contact form</p>
 

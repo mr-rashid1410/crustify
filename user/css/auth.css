@@ -133,3 +133,82 @@
   border-top: 1px solid var(--border);
   margin: 22px 0;
 }
+
+/* ── Password field with show/hide eye ────────────────
+   Placed after .form-group input so the extra right padding
+   wins the tie on equal specificity. */
+.pw-field {
+  position: relative;
+}
+
+.pw-field input {
+  padding-right: 46px;
+}
+
+.pw-toggle {
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--faint);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+
+.pw-toggle:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.pw-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Closed eye shows by default; .shown reveals the slashed one */
+.pw-toggle .pw-eye-off {
+  display: none;
+}
+
+.pw-toggle.shown .pw-eye {
+  display: none;
+}
+
+.pw-toggle.shown .pw-eye-off {
+  display: block;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────
+   This page previously had no breakpoints at all: the 44/40px box
+   padding left only ~280px of usable width on a 360px phone. */
+@media (max-width: 900px) {
+  .auth-section { padding: 44px 18px; }
+  .auth-box { padding: 34px 28px; }
+}
+
+@media (max-width: 560px) {
+  .auth-section { padding: 28px 14px; }
+  .auth-box { padding: 26px 20px; }
+  .auth-box h2 { font-size: 23px; }
+  .auth-box .subtitle { font-size: 12px; }
+
+  /* Comfortable touch height on the primary action */
+  .auth-btn { padding: 15px; }
+  .form-group input { padding: 13px 14px; font-size: 16px; }  /* 16px stops iOS zoom-on-focus */
+}
+
+@media (max-width: 400px) {
+  .auth-box { padding: 22px 16px; }
+  .auth-box h2 { font-size: 21px; }
+  .auth-footer { font-size: 13px; }
+  /* Keep the eye button clear of the input text on the narrowest phones */
+  .pw-field input { padding-right: 44px; }
+}

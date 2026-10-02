@@ -21,7 +21,15 @@
     </a>
   </div>
 
-  <nav class="nav">
+  <!-- Hamburger — only visible on small screens (see home.css) -->
+  <button class="nav-toggle" id="navToggle"
+          aria-label="Open menu" aria-expanded="false" aria-controls="mainNav">
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+  </button>
+
+  <nav class="nav" id="mainNav">
     <a href="index.html">Home</a>
     <a href="about.html">About Us</a>
     <a href="contact.html">Contact</a>
@@ -30,4 +38,7 @@
     <!-- Login / Profile link is injected by config.js updateNavbar() -->
     <span id="authLink"></span>
   </nav>
+
+  <!-- Tapping this closes the mobile menu -->
+  <div class="nav-backdrop" id="navBackdrop" hidden></div>
 </header>

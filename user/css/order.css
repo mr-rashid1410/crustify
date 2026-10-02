@@ -145,3 +145,26 @@
   .summary { position: static; width: 100%; }
   .bill-div { grid-template-columns: 1fr; }
 }
+
+/* Tablet: 80px gutters + two panels leave very little for the form */
+@media (max-width: 1200px) {
+  .order-page { padding: 40px 32px 70px; }
+}
+
+@media (max-width: 560px) {
+  .order-page { padding: 26px 14px 48px; }
+  .billing, .summary { padding: 20px 18px; }
+  .billing h2, .summary h2 { font-size: 19px; }
+  .bill-div { padding: 12px; gap: 10px; }
+  .billing input { padding: 13px 14px; font-size: 16px; }  /* 16px stops iOS zoom-on-focus */
+
+  /* Order line: keep the name readable, push the price to its own row */
+  .order-item { flex-wrap: wrap; }
+  .order-item span:last-child { margin-left: auto; }
+}
+
+@media (max-width: 400px) {
+  .order-page { padding: 22px 12px 40px; }
+  .billing, .summary { padding: 18px 14px; }
+  .order-item span:first-child { font-size: 13px; }
+}

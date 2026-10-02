@@ -123,3 +123,30 @@
   .contact-container { flex-direction: column; gap: 34px; }
   .contact-info, .contact-form { width: 100%; }
 }
+
+/* 42% + 58% plus the flex gap overflows once the 10% page padding
+   leaves less than ~900px, so relax the gutters first. */
+@media (max-width: 1100px) {
+  .contact-section { padding: 56px 6%; }
+  .contact-info h1 { font-size: 36px; }
+  .contact-form { padding: 28px; }
+}
+
+@media (max-width: 560px) {
+  .contact-section { padding: 34px 16px 46px; }
+  .contact-info h1 { font-size: clamp(28px, 8vw, 34px); }
+  .contact-info .subtitle { font-size: 15px; }
+
+  .contact-form { padding: 22px 18px; }
+  .contact-form h2 { font-size: 20px; }
+  .contact-form input,
+  .contact-form textarea { padding: 13px 14px; font-size: 16px; }  /* 16px stops iOS zoom-on-focus */
+
+  .info-box { padding: 18px 16px; }
+}
+
+@media (max-width: 400px) {
+  .contact-section { padding: 28px 12px 38px; }
+  .contact-form { padding: 20px 14px; }
+  .info-box p { font-size: 13px; }
+}

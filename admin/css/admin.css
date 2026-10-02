@@ -443,6 +443,52 @@ tbody tr:hover { background: rgba(255,255,255,0.02); }
 
 .admin-login-box input:focus { border-color: #e74c3c; }
 
+/* ── Password field with show/hide eye ────────────────
+   Needs the extra .admin-login-box prefix because the rules
+   above (.admin-login-box input / button) are more specific
+   and would otherwise force width:100% onto the toggle. */
+.admin-login-box .pw-field {
+  position: relative;
+}
+
+.admin-login-box .pw-field input {
+  padding-right: 44px;
+}
+
+.admin-login-box .pw-toggle {
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+
+.admin-login-box .pw-toggle:hover {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.12);
+}
+
+.admin-login-box .pw-toggle:focus-visible {
+  outline: 2px solid #e74c3c;
+  outline-offset: 1px;
+}
+
+/* Closed eye shows by default; .shown reveals the slashed one */
+.admin-login-box .pw-toggle .pw-eye-off { display: none; }
+.admin-login-box .pw-toggle.shown .pw-eye     { display: none; }
+.admin-login-box .pw-toggle.shown .pw-eye-off { display: block; }
+
 .admin-login-box button {
   width: 100%;
   padding: 13px;
@@ -469,4 +515,146 @@ select.status-select {
   padding: 4px 8px;
   font-size: 12px;
   cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   Breakpoints:
+      992px  sidebar becomes an off-canvas drawer (tablets/phones)
+      768px  tighter page padding, wrapped card headers
+      560px  2-col stat grid, bottom-sheet modals, tables scroll
+      400px  small phones
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Drawer trigger + backdrop (hidden on desktop) ─────────────────
+   Markup is added by every admin page: the button sits as the first
+   child of .main, the backdrop just after </aside>. */
+.sidebar-toggle {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+  background: #1a1a1a;
+  color: #fff;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sidebar-toggle .icon { font-size: 16px; line-height: 1; }
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 90;
+}
+
+.sidebar-backdrop:not([hidden]) { display: block; }
+
+/* ── 992px: off-canvas sidebar ───────────────────────────────────── */
+@media (max-width: 992px) {
+  /* Slide the drawer off-screen; .open brings it back.
+     Kept in the DOM (not display:none) so the transition runs. */
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: none;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+  }
+
+  /* No more 230px reservation once the drawer is overlay-only */
+  .main { margin-left: 0; }
+
+  .sidebar-toggle { display: inline-flex; }
+}
+
+/* ── 768px: page padding + wrapping headers ──────────────────────── */
+@media (max-width: 768px) {
+  .main { padding: 22px 18px 40px; }
+
+  .page-title { font-size: clamp(20px, 4.5vw, 24px); }
+  .page-subtitle { font-size: 12px; margin-bottom: 20px; }
+
+  .card { padding: 18px; border-radius: 10px; }
+  .card-header { flex-wrap: wrap; gap: 12px; }
+  .card-header h3 { font-size: 15px; }
+
+  /* Let the search box fill the row instead of holding 220px */
+  .search-input { width: 100%; }
+
+  /* Inputs need 16px or iOS zooms the viewport on focus */
+  .modal input,
+  .modal textarea,
+  .modal select { font-size: 16px; }
+}
+
+/* ── 560px: phones ───────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .main { padding: 18px 14px 34px; }
+
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .stat-card { padding: 14px 12px; }
+  .stat-card .value { font-size: 20px; }
+
+  /* Modals: near-full-width with room to breathe */
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    padding: 22px 18px;
+    border-radius: 12px 12px 0 0;
+    max-height: 92vh;
+    overflow-y: auto;
+    align-self: flex-end;      /* anchor to the bottom = sheet feel */
+  }
+
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .modal h3 { font-size: 16px; margin-bottom: 18px; }
+  .modal-footer { flex-direction: column-reverse; }
+  .modal-footer button { width: 100%; }
+
+  /* Let the table scroll horizontally instead of crushing columns
+     into unreadable slivers. -webkit prefix keeps iOS momentum scroll. */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -18px;
+    padding: 0 18px;
+  }
+  table { min-width: 620px; }
+
+  .btn { padding: 9px 14px; }
+  .btn-sm { padding: 7px 11px; }
+
+  .sidebar-toggle { width: 100%; justify-content: center; }
+
+  /* Preview + body is a flex row; a file input refuses to shrink below
+     its intrinsic width, so stack them on the narrowest phones. */
+  .img-picker { flex-direction: column; align-items: stretch; }
+}
+
+/* ── 400px: small phones ─────────────────────────────────────────── */
+@media (max-width: 400px) {
+  .main { padding: 16px 12px 28px; }
+
+  .stats-grid { grid-template-columns: 1fr; }
+  .card { padding: 16px 14px; }
+  .table-wrap { margin: 0 -14px; padding: 0 14px; }
+
+  /* The login card must never force a sideways scroll */
+  .admin-login-wrap { padding: 16px; }
+  .admin-login-box { padding: 26px 20px; }
+}
+
+/* ── Respect users who ask for less motion ───────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar { transition: none !important; }
 }
