@@ -5,7 +5,8 @@
 //       management for the admin panel.
 // ─────────────────────────────────────────────
 
-const API_URL = "http://localhost:5000/api";
+// const API_URL = "http://localhost:5000/api";
+const API_URL = "https://crustify.onrender.com/api"
 
 // Where the bundled product photos live, relative to admin/
 const LOCAL_IMAGE_DIR = "../user/images/";
