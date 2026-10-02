@@ -85,6 +85,12 @@ body.has-sidebar {
   margin-left: 230px;
   flex: 1;
   padding: 30px;
+  /* .main is a flex item of body.has-sidebar, and flex items default to
+     min-width:auto — meaning they refuse to shrink below their content's
+     min-content width. The tables (min-width:620px) then forced .main to
+     674px on phones and pushed the whole page sideways. min-width:0 lets
+     .main shrink and .table-wrap do its own horizontal scrolling. */
+  min-width: 0;
 }
 
 .page-title {
@@ -622,12 +628,14 @@ select.status-select {
   .modal-footer button { width: 100%; }
 
   /* Let the table scroll horizontally instead of crushing columns
-     into unreadable slivers. -webkit prefix keeps iOS momentum scroll. */
+     into unreadable slivers. -webkit prefix keeps iOS momentum scroll.
+     The negative margin must match .main's side padding exactly,
+     otherwise the bleed itself overflows the viewport. */
   .table-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    margin: 0 -18px;
-    padding: 0 18px;
+    margin: 0 -14px;
+    padding: 0 14px;
   }
   table { min-width: 620px; }
 
@@ -647,7 +655,7 @@ select.status-select {
 
   .stats-grid { grid-template-columns: 1fr; }
   .card { padding: 16px 14px; }
-  .table-wrap { margin: 0 -14px; padding: 0 14px; }
+  .table-wrap { margin: 0 -12px; padding: 0 12px; }
 
   /* The login card must never force a sideways scroll */
   .admin-login-wrap { padding: 16px; }

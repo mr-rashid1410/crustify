@@ -120,6 +120,77 @@ with an amber accent.
 `admin/css/admin.css` was intentionally **not** re-themed to match; the admin
 panel got copy-only rebranding, per the user's decision.
 
+## Responsive layout
+
+Every page in both apps is responsive down to 320px. Breakpoints are shared
+across all stylesheets — reuse them instead of inventing new ones:
+
+| Width | What changes |
+| --- | --- |
+| 1240px | `about.css` relaxes its hero gutters (520+560+160px otherwise overflows) |
+| 1200px | `home.css` header padding; `cart.css`/`order.css` page gutters |
+| 1100px | `menu.css` product grid 3 → 2; `contect.css` drops 10% page padding |
+| 992px  | **admin**: sidebar becomes an off-canvas drawer, `.main` loses its 230px margin |
+| 900px  | hero/side-by-side sections stack (pre-existing) |
+| 768px  | **user**: hamburger nav; **admin**: tighter page padding, `.card-header` wraps |
+| 700px  | `menu.css` product grid 2 → 1 |
+| 560px  | compact gutters/type, 2-col stat grid, bottom-sheet modals, tables scroll |
+| 400px  | small phones |
+
+Two structural rules, both of which caused real bugs:
+
+1. **`.main` needs `min-width: 0`** (`admin/css/admin.css`). `body.has-sidebar`
+   is `display: flex`, and a flex item defaults to `min-width: auto`, so it
+   refuses to shrink below its content's min-content width. The tables
+   (`min-width: 620px`) pinned `.main` at 674px on a 390px phone and pushed
+   the whole page sideways. `min-width: 0` lets `.main` shrink so
+   `.table-wrap` can scroll on its own.
+2. **Negative-margin bleeds must match the container padding exactly.**
+   `.table-wrap { margin: 0 -14px }` inside `.main { padding: … 14px }` is
+   edge-to-edge; any mismatch (e.g. `-18px` against `14px` padding) overflows
+   the viewport by the difference.
+
+**Off-canvas drawers** (admin sidebar, user mobile nav) follow one pattern:
+markup button + `hidden` backdrop, a `setup*Toggle()` helper in the shared
+script (`admin/js/api.js`, `user/javaScript/config.js`) bound on
+`DOMContentLoaded`, idempotent via a `dataset.*Bound` flag, closing on
+backdrop click / `Escape` / resize past the breakpoint. The admin drawer
+resets at `> 992px`, the user nav at `> 768px` — keep those numbers in sync
+with the CSS breakpoints.
+
+**Never put a negative `margin` or a fixed `width` on a container without a
+matching max-width**, and keep form `font-size` at `16px` below 768px or iOS
+zooms the viewport on focus.
+
+## Verification
+
+There is no test command in this repo. Layout was verified out-of-band by
+driving headless Chrome over the DevTools Protocol at 320/390/768/992/1440px:
+assert `document.documentElement.scrollWidth - clientWidth <= 1` per page, and
+exercise the drawers by dispatching real clicks. Two things to know if you
+repeat that:
+
+- Admin/user pages redirect to their login page unless `localStorage` has a
+  session, so seed `adminToken`+`adminUser` (`role: "admin"`) or
+  `token`+`user` via `Page.addScriptToEvaluateOnNewDocument`.
+- `user/javaScript/order.js` fires an `alert()` when logged out, which blocks
+  headless Chrome until the evaluate times out. Seed a session or clear
+  storage first.
+
+## Password visibility toggle
+
+All three password fields (`user/html/login.html`, `user/html/register.html`,
+`admin/login.html`) use the same pattern: a `.pw-field` wrapper, a
+`type="button"` `.pw-toggle` carrying `data-pw-toggle`, and two inline SVGs
+(`.pw-eye`, `.pw-eye-off`) swapped purely in CSS by the `.shown` class. JS only
+flips the class, the input `type`, and `aria-pressed`/`aria-label`.
+`setupPasswordToggles()` in both `config.js` and `admin/js/api.js` binds every
+`[data-pw-toggle]` it finds, so new fields need no JS.
+
+In `admin/css/admin.css` the rules are prefixed `.admin-login-box .pw-toggle`
+because the bare `.admin-login-box button` rule is `width: 100%` and would
+otherwise stretch the eye into a full-width red button.
+
 ## Conventions
 
 **backend/** — CommonJS, `require`, no build/transpile. Mongoose schemas in `models/`, business logic in `controllers/`, thin `routes/`, JWT guard in `middleware/authMiddleware.js` (`protect`, `adminOnly`). Errors are ad-hoc `try/catch` returning `res.status(500).json({ message: "Server error: " + ... })` — there is no centralized error middleware. No validation library (no Zod/Joi/express-validator). Match this style; don't introduce a validation layer in one endpoint only.
@@ -135,6 +206,12 @@ panel got copy-only rebranding, per the user's decision.
 - `user/images/` is ~26 MB with several 2–3 MB PNGs. Products now mostly point at hosted URLs; these are fallbacks.
 - `docgen/generate.js` contains placeholder `"Student Name 1 (Roll No.)"` strings that must be filled before submission.
 - `.env` still carries a `pizzamania_`-prefixed `JWT_SECRET` and the seed still creates `admin@pizzamania.com`. Intentional — renaming the secret would invalidate every existing token.
+- The seeded admin's stored password no longer matches `backend/seed.js`
+  (`admin@123` returns 401 from `POST /api/auth/login`). `seed.js` only creates
+  the admin when no user with that email exists, so re-seeding won't correct it.
+  Fix with a manual password reset, not by editing the seed.
+- `user/javaScript/order.js` calls `alert()` when logged out, which blocks
+  headless-browser automation until the call times out.
 
 ## Editing the project report
 
