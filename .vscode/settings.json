@@ -1,0 +1,5 @@
+{
+  "//": "Open the PROJECT ROOT (E:\\pizza mania) in VS Code and use Live Server. Serving the root means both apps work from one server: the admin panel's ../user/images/ path stays inside the served folder, so bundled product photos resolve as well as uploaded ones.",
+  "liveServer.settings.port": 5500,
+  "liveServer.settings.root": "/"
+}

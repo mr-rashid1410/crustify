@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Confirmed | Crustify</title>
+  <link rel="stylesheet" href="../css/home.css">
+  <link rel="stylesheet" href="../css/confirmed.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar"></div>
+
+  <div class="confirm-container">
+
+    <div class="success">
+      <div class="check">✔</div>
+      <h1>Order Confirmed!</h1>
+      <p>Thank you for your order. Your delicious pizzas are on the way 🍕</p>
+    </div>
+
+    <div class="details">
+
+      <!-- LEFT: Order Summary -->
+      <div class="summary">
+        <h2>Order Summary</h2>
+        <div id="orderItems"></div>
+
+        <div class="totals">
+          <p>Subtotal <span id="subTotal"></span></p>
+          <p>Tax      <span id="tax"></span></p>
+          <h3>Total   <span id="total"></span></h3>
+        </div>
+      </div>
+
+      <!-- RIGHT: Billing Details -->
+      <div class="address">
+        <h2>Delivery Details</h2>
+        <p><strong>Name</strong>    <span id="name"></span></p>
+        <p><strong>Address</strong> <span id="address"></span></p>
+        <p><strong>City</strong>    <span id="city"></span></p>
+        <p><strong>Phone</strong>   <span id="phone"></span></p>
+
+        <button onclick="goHome()">Continue Shopping</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- config.js first, then confirmed.js -->
+  <script src="../javaScript/config.js"></script>
+  <script src="../javaScript/confirmed.js"></script>
+
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("navbar").innerHTML = data;
+        updateNavbar();
+      });
+  </script>
+
+</body>
+</html>

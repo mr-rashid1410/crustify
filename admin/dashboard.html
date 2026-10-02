@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | Crustify Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="has-sidebar">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h2>🔥 Crustify</h2>
+      <p>Admin Panel</p>
+    </div>
+    <nav>
+      <a href="dashboard.html" class="active">
+        <span class="icon">📊</span> Dashboard
+      </a>
+      <a href="products.html">
+        <span class="icon">🍕</span> Products
+      </a>
+      <a href="categories.html">
+        <span class="icon">🏷️</span> Categories
+      </a>
+      <a href="orders.html">
+        <span class="icon">📦</span> Orders
+      </a>
+      <a href="users.html">
+        <span class="icon">👥</span> Users
+      </a>
+      <a href="contacts.html">
+        <span class="icon">✉️</span> Enquiries
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a onclick="adminLogout()">🚪 Logout</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Welcome back, <span id="adminName">Admin</span></p>
+
+    <!-- Stat Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <p class="label">Total Orders</p>
+        <p class="value" id="totalOrders">—</p>
+      </div>
+      <div class="stat-card">
+        <p class="label">Total Revenue</p>
+        <p class="value" id="revenue">—</p>
+      </div>
+      <div class="stat-card">
+        <p class="label">Total Users</p>
+        <p class="value" id="totalUsers">—</p>
+      </div>
+      <div class="stat-card">
+        <p class="label">Products</p>
+        <p class="value" id="totalProducts">—</p>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Recent Orders</h3>
+        <a href="orders.html" class="btn btn-primary btn-sm">View All</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="recentOrdersBody">
+            <tr><td colspan="6" style="color:#666;text-align:center;padding:20px;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="js/api.js"></script>
+  <script>
+    requireAdmin();
+
+    // Show admin name
+    const admin = getAdminUser();
+    if (admin) document.getElementById("adminName").textContent = admin.name;
+
+    // Load dashboard stats
+    async function loadStats() {
+      try {
+        const res  = await fetch(`${API_URL}/orders/admin/stats`, { headers: adminHeaders() });
+        const data = await res.json();
+
+        if (res.ok) {
+          document.getElementById("totalOrders").textContent   = data.totalOrders;
+          document.getElementById("revenue").textContent       = "₹" + data.revenue.toLocaleString("en-IN");
+          document.getElementById("totalUsers").textContent    = data.totalUsers;
+          document.getElementById("totalProducts").textContent = data.totalProducts;
+        }
+      } catch (err) {
+        console.error("Stats error:", err);
+      }
+    }
+
+    // Load recent orders (latest 5)
+    async function loadRecentOrders() {
+      const tbody = document.getElementById("recentOrdersBody");
+      try {
+        const res    = await fetch(`${API_URL}/orders/admin/all`, { headers: adminHeaders() });
+        const orders = await res.json();
+
+        if (!res.ok || orders.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="color:#666;text-align:center;padding:20px;">No orders yet.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = orders.slice(0, 5).map(o => `
+          <tr>
+            <td style="font-family:monospace;color:#e74c3c;">#${o._id.slice(-6).toUpperCase()}</td>
+            <td>${o.user ? o.user.name : o.billingDetails.name}</td>
+            <td style="color:#888;">${o.items.length} item${o.items.length > 1 ? "s" : ""}</td>
+            <td style="color:#fff;font-weight:bold;">₹${o.total}</td>
+            <td><span class="badge badge-${o.status}">${o.status}</span></td>
+            <td style="color:#666;">${new Date(o.createdAt).toLocaleDateString("en-IN")}</td>
+          </tr>
+        `).join("");
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color:#ff6b6b;">Error loading orders.</td></tr>`;
+      }
+    }
+
+    loadStats();
+    loadRecentOrders();
+  </script>
+
+</body>
+</html>

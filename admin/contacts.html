@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enquiries | Crustify Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="has-sidebar">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h2>🔥 Crustify</h2>
+      <p>Admin Panel</p>
+    </div>
+    <nav>
+      <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+      <a href="products.html"><span class="icon">🍕</span> Products</a>
+      <a href="categories.html"><span class="icon">🏷️</span> Categories</a>
+      <a href="orders.html"><span class="icon">📦</span> Orders</a>
+      <a href="users.html"><span class="icon">👥</span> Users</a>
+      <a href="contacts.html" class="active"><span class="icon">✉️</span> Enquiries</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a onclick="adminLogout()">🚪 Logout</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <h1 class="page-title">Contact Enquiries</h1>
+    <p class="page-subtitle">Messages submitted through the contact form</p>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>All Enquiries</h3>
+        <input class="search-input" id="searchInput" type="text" placeholder="Search by name or email...">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Message</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="contactsBody">
+            <tr><td colspan="6" style="color:#666;text-align:center;padding:20px;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Message detail modal -->
+  <div class="modal-overlay" id="msgModal">
+    <div class="modal" style="max-width:520px;">
+      <h3>Enquiry Detail</h3>
+      <div id="msgDetail"></div>
+      <div class="modal-footer">
+        <button class="btn btn-primary btn-sm" id="markReadBtn" onclick="markRead()">Mark as Read</button>
+        <button class="btn btn-cancel" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    requireAdmin();
+
+    let allContacts = [];
+    let currentId   = null;
+
+    // ── Load enquiries ─────────────────────────────────────────────────
+    async function loadContacts() {
+      const tbody = document.getElementById("contactsBody");
+      try {
+        const res = await fetch(`${API_URL}/contact/admin/all`, { headers: adminHeaders() });
+        allContacts = await res.json();
+
+        if (!res.ok || allContacts.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="color:#666;text-align:center;padding:24px;">No enquiries yet.</td></tr>`;
+          return;
+        }
+
+        renderContacts(allContacts);
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color:#ff6b6b;">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    // ── Render rows ────────────────────────────────────────────────────
+    function renderContacts(list) {
+      const tbody = document.getElementById("contactsBody");
+      tbody.innerHTML = list.map(c => `
+        <tr style="${!c.isRead ? 'background:rgba(231,76,60,0.04);' : ''}">
+          <td>
+            <span style="color:#fff;font-weight:${c.isRead ? '400' : '600'}">
+              ${c.firstName} ${c.lastName}
+            </span>
+          </td>
+          <td style="color:#aaa;">${c.email}</td>
+          <td style="color:#666;">${c.phone || "—"}</td>
+          <td style="color:#888;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+            ${c.message}
+          </td>
+          <td style="color:#666;">
+            ${new Date(c.createdAt).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}
+          </td>
+          <td>
+            <span class="badge ${c.isRead ? 'badge-confirmed' : 'badge-pending'}">
+              ${c.isRead ? "Read" : "New"}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-edit btn-sm" onclick="openDetail('${c._id}')">View</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    // ── Open detail modal ──────────────────────────────────────────────
+    function openDetail(id) {
+      const c = allContacts.find(x => x._id === id);
+      if (!c) return;
+      currentId = id;
+
+      document.getElementById("msgDetail").innerHTML = `
+        <div style="margin-bottom:16px;">
+          <p style="color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">From</p>
+          <p style="color:#fff;font-size:15px;">${c.firstName} ${c.lastName}</p>
+          <p style="color:#888;font-size:13px;">${c.email}${c.phone ? ' &bull; ' + c.phone : ''}</p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <p style="color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Message</p>
+          <p style="color:#ccc;font-size:14px;line-height:1.7;background:#111;padding:16px;border-radius:8px;border:1px solid #222;">
+            ${c.message}
+          </p>
+        </div>
+        <p style="color:#555;font-size:12px;">
+          Received: ${new Date(c.createdAt).toLocaleString("en-IN")}
+        </p>
+      `;
+
+      const btn = document.getElementById("markReadBtn");
+      btn.style.display = c.isRead ? "none" : "inline-block";
+
+      document.getElementById("msgModal").classList.add("open");
+    }
+
+    // ── Mark as read ───────────────────────────────────────────────────
+    async function markRead() {
+      if (!currentId) return;
+      try {
+        await fetch(`${API_URL}/contact/${currentId}/read`, {
+          method: "PUT", headers: adminHeaders(),
+        });
+        closeModal();
+        showToast("Marked as read", "success");
+        loadContacts();
+      } catch (err) {
+        showToast("Error: " + err.message, "error");
+      }
+    }
+
+    function closeModal() {
+      document.getElementById("msgModal").classList.remove("open");
+      currentId = null;
+    }
+
+    // ── Search ─────────────────────────────────────────────────────────
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("searchInput").addEventListener("input", e => {
+        const q = e.target.value.toLowerCase();
+        renderContacts(allContacts.filter(c =>
+          `${c.firstName} ${c.lastName}`.toLowerCase().includes(q) ||
+          c.email.toLowerCase().includes(q)
+        ));
+      });
+    });
+
+    loadContacts();
+  </script>
+
+</body>
+</html>

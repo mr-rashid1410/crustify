@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Contact Us | Crustify</title>
+    <link rel="stylesheet" href="../css/contect.css" />
+    <link rel="stylesheet" href="../css/home.css" />
+    <style>
+      .contact-msg {
+        padding: 11px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-bottom: 16px;
+        display: none;
+      }
+      .contact-msg.success {
+        background: rgba(46,204,113,0.12);
+        border: 1px solid #2ecc71;
+        color: #2ecc71;
+        display: block;
+      }
+      .contact-msg.error {
+        background: rgba(192,57,43,0.15);
+        border: 1px solid #c0392b;
+        color: #ff6b6b;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="navbar"></div>
+
+    <section class="contact-section">
+      <div class="contact-container">
+        <!-- LEFT SIDE -->
+        <div class="contact-info">
+          <h1>Contact Us</h1>
+          <p class="subtitle">Get in touch for reservations or queries</p>
+
+          <div class="info-box">
+            <h3>Address</h3>
+            <p>📍 123 Pizza Street, Food District<br />New Delhi, 110001, India</p>
+          </div>
+
+          <div class="info-box">
+            <h3>Phone</h3>
+            <p>📞 +91 9876543210<br />📞 +91 1234567890</p>
+          </div>
+
+          <div class="info-box">
+            <h3>Email</h3>
+            <p>✉ info@crustify.com<br />✉ orders@crustify.com</p>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="contact-form">
+          <h2>Send us a Message</h2>
+
+          <div class="contact-msg" id="contactMsg"></div>
+
+          <form id="contactForm">
+            <input type="text"  id="firstName"  placeholder="First Name"             required />
+            <input type="text"  id="lastName"   placeholder="Last Name"              required />
+            <input type="email" id="email"       placeholder="your.email@example.com" required />
+            <input type="text"  id="phone"       placeholder="+91 9876543210" />
+            <textarea id="message" placeholder="Tell us how we can help you..." rows="4"></textarea>
+
+            <button type="submit" id="sendBtn">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <script src="../javaScript/config.js"></script>
+    <script>
+      fetch("navbar.html")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("navbar").innerHTML = data;
+          updateNavbar();
+        });
+
+      document.getElementById("contactForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const btn = document.getElementById("sendBtn");
+        const msg = document.getElementById("contactMsg");
+
+        btn.disabled    = true;
+        btn.textContent = "Sending...";
+        msg.className   = "contact-msg";
+
+        const body = {
+          firstName: document.getElementById("firstName").value.trim(),
+          lastName:  document.getElementById("lastName").value.trim(),
+          email:     document.getElementById("email").value.trim(),
+          phone:     document.getElementById("phone").value.trim(),
+          message:   document.getElementById("message").value.trim(),
+        };
+
+        try {
+          const res  = await fetch(`${API_URL}/contact`, {
+            method:  "POST",
+            headers: { "Content-Type": "application/json" },
+            body:    JSON.stringify(body),
+          });
+          const data = await res.json();
+
+          if (!res.ok) {
+            msg.className   = "contact-msg error";
+            msg.textContent = data.message;
+            btn.disabled    = false;
+            btn.textContent = "Send Message";
+            return;
+          }
+
+          msg.className   = "contact-msg success";
+          msg.textContent = data.message;
+          document.getElementById("contactForm").reset();
+          btn.disabled    = false;
+          btn.textContent = "Send Message";
+
+        } catch (err) {
+          msg.className   = "contact-msg error";
+          msg.textContent = "Network error. Is the server running?";
+          btn.disabled    = false;
+          btn.textContent = "Send Message";
+        }
+      });
+    </script>
+  </body>
+</html>

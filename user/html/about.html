@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About Us | Crustify</title>
+  <link rel="stylesheet" href="../css/about.css">
+  <link rel="stylesheet" href="../css/home.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar"></div>
+
+  <!-- About Hero -->
+  <section class="about-hero">
+    <div class="about-left">
+      <h1>About Us</h1>
+      <p>
+        Crustify started as a single stone-baked oven and a stubborn
+        belief that fast food deserves the same care as a slow kitchen.
+      </p>
+      <p>
+        Today we serve pizza, burgers, sandwiches, shawarma, sides and
+        more — all cooked to order and delivered while they're still hot.
+        No heat lamps, no shortcuts.
+      </p>
+    </div>
+
+    <div class="about-right">
+      <img
+        src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&h=600&fit=crop&auto=format&q=80"
+        alt="Food being prepared in the Crustify kitchen"
+        onerror="this.src='../images/about.png'"
+      />
+    </div>
+  </section>
+
+  <!-- Info Cards -->
+  <section class="about-cards">
+    <div class="card">
+      <h3>🍕 Our Story</h3>
+      <p>
+        Founded by a group of friends who were tired of lukewarm deliveries,
+        Crustify began with one oven, one van and a lot of garlic.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>🌿 Fresh Ingredients</h3>
+      <p>
+        We buy produce daily and prove our dough for 24 hours before it ever
+        meets the oven. Nothing is frozen, nothing sits.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>🔥 Our Passion</h3>
+      <p>
+        Our cooks are paid to be good at this, not fast. Every dish is made
+        to order, right after you press the button.
+      </p>
+    </div>
+  </section>
+
+  <!-- Banner -->
+  <section class="about-banner">
+    <h2>Test, hygiene and happiness</h2>
+    <span>The three things we will never compromise on.</span>
+  </section>
+
+  <!-- Navbar Load -->
+  <script src="../javaScript/config.js"></script>
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("navbar").innerHTML = data;
+        updateNavbar();
+      });
+  </script>
+
+</body>
+</html>

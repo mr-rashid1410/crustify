@@ -1,0 +1,147 @@
+/* ─────────────────────────────────────────────
+   order.css  —  Checkout page
+   ───────────────────────────────────────────── */
+
+.order-page {
+  padding: 50px 80px 90px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.order-container {
+  display: flex;
+  gap: 26px;
+  margin-top: 40px;
+  align-items: flex-start;
+}
+
+.billing,
+.summary {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  padding: 28px;
+  border-radius: var(--radius);
+}
+
+.billing {
+  flex: 1.4;
+}
+
+.summary {
+  flex: 0.8;
+  position: sticky;
+  top: 100px;
+}
+
+.billing h2,
+.summary h2 {
+  font-size: 19px;
+  margin-bottom: 22px;
+}
+
+.billing .form-group {
+  margin-bottom: 4px;
+}
+
+.billing input {
+  width: 100%;
+  padding: 12px 14px;
+  margin: 8px 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.billing input:focus {
+  border-color: var(--accent);
+}
+
+.bill-div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 14px;
+}
+
+#placeOrder {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--accent-deep), var(--accent));
+  border: none;
+  color: #1a1206;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#placeOrder:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px var(--accent-glow);
+}
+
+#placeOrder:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.order-item span:first-child {
+  text-align: left;
+}
+
+.order-item span:last-child {
+  text-align: right;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.summary p,
+.summary h3 {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 15px;
+  margin-top: 16px;
+}
+
+.summary p span,
+.summary h3 span {
+  color: var(--text);
+}
+
+.summary h3 {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  font-size: 17px;
+}
+
+.summary h3 span {
+  color: var(--accent);
+  font-size: 19px;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .order-page { padding: 34px 20px 60px; }
+  .order-container { flex-direction: column; }
+  .summary { position: static; width: 100%; }
+  .bill-div { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Categories | Crustify Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="has-sidebar">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h2>🔥 Crustify</h2>
+      <p>Admin Panel</p>
+    </div>
+    <nav>
+      <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+      <a href="products.html"><span class="icon">🍕</span> Products</a>
+      <a href="categories.html" class="active"><span class="icon">🏷️</span> Categories</a>
+      <a href="orders.html"><span class="icon">📦</span> Orders</a>
+      <a href="users.html"><span class="icon">👥</span> Users</a>
+      <a href="contacts.html"><span class="icon">✉️</span> Enquiries</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a onclick="adminLogout()">🚪 Logout</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <h1 class="page-title">Categories</h1>
+    <p class="page-subtitle">
+      Manage the categories products are filed under — one is kept as the default
+    </p>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>All Categories</h3>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input class="search-input" id="searchInput" type="text" placeholder="Search category...">
+          <button class="btn btn-primary" onclick="openAddModal()">+ Add Category</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Products</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="categoriesBody">
+            <tr><td colspan="4" style="color:#666;text-align:center;padding:20px;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add / Edit Modal -->
+  <div class="modal-overlay" id="categoryModal">
+    <div class="modal">
+      <h3 id="modalTitle">Add Category</h3>
+
+      <input type="hidden" id="editId">
+
+      <div class="form-group">
+        <label>Category Name * <small style="color:#666">(e.g. Beverages)</small></label>
+        <input type="text" id="catName" placeholder="e.g. Beverages" maxlength="50">
+      </div>
+      <p style="color:#666;font-size:12px;line-height:1.6;">
+        Renaming a category moves its products across automatically.
+        The default category can be renamed but never deleted.
+      </p>
+
+      <div id="modalMsg" style="color:#ff6b6b;font-size:13px;min-height:18px;margin-top:12px;"></div>
+
+      <div class="modal-footer">
+        <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCategory()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    requireAdmin();
+
+    let allCategories = [];
+
+    // ── Load all categories ────────────────────────────────────────────
+    async function loadCategories() {
+      const tbody = document.getElementById("categoriesBody");
+      try {
+        const res  = await fetch(`${API_URL}/categories`, { headers: adminHeaders() });
+        const data = await res.json();
+
+        if (!res.ok) {
+          tbody.innerHTML = `<tr><td colspan="4" style="color:#ff6b6b;">Error: ${data.message || "Could not load categories"}</td></tr>`;
+          return;
+        }
+
+        allCategories = data;
+        renderCategories(allCategories);
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" style="color:#ff6b6b;">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    // ── Render rows ────────────────────────────────────────────────────
+    function renderCategories(list) {
+      const tbody = document.getElementById("categoriesBody");
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="color:#666;text-align:center;padding:24px;">No categories found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(c => `
+        <tr>
+          <td style="color:#fff;font-weight:500;">${c.name}</td>
+          <td style="color:${c.productCount ? "#aaa" : "#555"};">
+            ${c.productCount} product${c.productCount === 1 ? "" : "s"}
+          </td>
+          <td>
+            <span class="badge ${c.isDefault ? "badge-default" : "badge-cat"}">
+              ${c.isDefault ? "Default" : "Active"}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-edit btn-sm" onclick="openEditModal('${c._id}')">Edit</button>
+            <button class="btn btn-primary btn-sm" style="margin-left:6px;"
+              onclick="setDefaultCategory('${c._id}')"
+              ${c.isDefault ? "disabled" : ""}
+              title="${c.isDefault ? "Already the default category" : "Make this the default category"}">
+              Set Default
+            </button>
+            <button class="btn btn-delete btn-sm" style="margin-left:6px;"
+              onclick="deleteCategory('${c._id}')"
+              ${c.isDefault ? "disabled" : ""}
+              title="${c.isDefault ? "The default category cannot be deleted" : "Delete this category"}">
+              Delete
+            </button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    // ── Name of the current default category ───────────────────────────
+    function defaultCategoryName() {
+      const d = allCategories.find(c => c.isDefault);
+      return d ? d.name : "";
+    }
+
+    // ── Modal helpers ──────────────────────────────────────────────────
+    function openAddModal() {
+      document.getElementById("modalTitle").textContent = "Add Category";
+      document.getElementById("editId").value   = "";
+      document.getElementById("catName").value  = "";
+      document.getElementById("modalMsg").textContent = "";
+      document.getElementById("categoryModal").classList.add("open");
+      document.getElementById("catName").focus();
+    }
+
+    function openEditModal(id) {
+      const c = allCategories.find(x => x._id === id);
+      if (!c) return;
+
+      document.getElementById("modalTitle").textContent = "Edit Category";
+      document.getElementById("editId").value   = c._id;
+      document.getElementById("catName").value  = c.name;
+      document.getElementById("modalMsg").textContent = "";
+      document.getElementById("categoryModal").classList.add("open");
+      document.getElementById("catName").focus();
+    }
+
+    function closeModal() {
+      document.getElementById("categoryModal").classList.remove("open");
+    }
+
+    // ── Save category (add or edit) ────────────────────────────────────
+    async function saveCategory() {
+      const id   = document.getElementById("editId").value;
+      const name = document.getElementById("catName").value.trim();
+      const msgEl = document.getElementById("modalMsg");
+
+      if (!name) {
+        msgEl.textContent = "Category name is required.";
+        return;
+      }
+
+      try {
+        const url    = id ? `${API_URL}/categories/${id}` : `${API_URL}/categories`;
+        const method = id ? "PUT" : "POST";
+
+        const res  = await fetch(url, {
+          method,
+          headers: adminHeaders(),
+          body:    JSON.stringify({ name }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) { msgEl.textContent = data.message; return; }
+
+        closeModal();
+        showToast(id ? "Category updated!" : "Category added!", "success");
+        loadCategories();
+
+      } catch (err) {
+        msgEl.textContent = "Network error: " + err.message;
+      }
+    }
+
+    // ── Make a category the default ────────────────────────────────────
+    async function setDefaultCategory(id) {
+      const c = allCategories.find(x => x._id === id);
+      if (!c) return;
+
+      try {
+        const res  = await fetch(`${API_URL}/categories/${id}/default`, {
+          method:  "PUT",
+          headers: adminHeaders(),
+        });
+        const data = await res.json();
+
+        if (!res.ok) { showToast(data.message, "error"); return; }
+
+        showToast(data.message, "success");
+        loadCategories();
+
+      } catch (err) {
+        showToast("Error: " + err.message, "error");
+      }
+    }
+
+    // ── Delete category ────────────────────────────────────────────────
+    async function deleteCategory(id) {
+      const c = allCategories.find(x => x._id === id);
+      if (!c) return;
+
+      let warning = `Delete "${c.name}"? This cannot be undone.`;
+      if (c.productCount > 0) {
+        warning += `\n\n${c.productCount} product(s) will be moved to the default category "${defaultCategoryName()}".`;
+      }
+
+      if (!confirm(warning)) return;
+
+      try {
+        const res  = await fetch(`${API_URL}/categories/${id}`, {
+          method:  "DELETE",
+          headers: adminHeaders(),
+        });
+        const data = await res.json();
+
+        if (!res.ok) { showToast(data.message, "error"); return; }
+
+        showToast(data.message, "success");
+        loadCategories();
+
+      } catch (err) {
+        showToast("Error: " + err.message, "error");
+      }
+    }
+
+    // ── Search ─────────────────────────────────────────────────────────
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("searchInput").addEventListener("input", e => {
+        const q = e.target.value.trim().toLowerCase();
+        renderCategories(
+          allCategories.filter(c => c.name.toLowerCase().includes(q))
+        );
+      });
+    });
+
+    loadCategories();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,202 @@
+/* ─────────────────────────────────────────────
+   menu.css  —  Menu page + category filter
+   ───────────────────────────────────────────── */
+
+.menu {
+  padding: 70px 80px 90px;
+  min-height: 100vh;
+}
+
+.menu h1 {
+  font-size: 44px;
+}
+
+/* ── Category filter ─────────────────────────────
+   Chips are rendered by menu.js straight from the
+   categories collection, so adding a category in
+   the admin panel adds a chip here automatically. */
+.category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-chip:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.filter-chip.active {
+  background: linear-gradient(135deg, var(--accent-deep), var(--accent));
+  border-color: transparent;
+  color: #1a1206;
+  font-weight: 700;
+}
+
+.filter-chip .count {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+}
+
+/* ── Product card ────────────────────────────── */
+.menu-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  overflow: hidden;
+  padding-bottom: 24px;
+  text-align: center;
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+
+.menu-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent);
+  box-shadow: 0 20px 38px rgba(0, 0, 0, 0.5);
+}
+
+.menu-card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--surface-2);
+}
+
+/* Category label on the card */
+.menu-card .card-cat {
+  display: inline-block;
+  margin: 16px 0 4px;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface-2);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.menu-card h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  padding: 0 16px;
+}
+
+.menu-card p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0 18px 14px;
+  min-height: 44px;
+}
+
+.menu-card .price {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+/* Popular tag */
+.menu-card .tag {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  padding: 5px 11px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #1a1206;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.add-to-cart {
+  display: inline-block;
+  margin: 0 18px;
+  padding: 11px 26px;
+  background: linear-gradient(135deg, var(--accent-deep), var(--accent));
+  color: #1a1206;
+  text-decoration: none;
+  border: none;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.add-to-cart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px var(--accent-glow);
+}
+
+/* Success flash after adding — menu.js swaps the text for a moment */
+.add-to-cart.added {
+  background: var(--success);
+  box-shadow: none;
+  transform: none;
+}
+
+/* ── Empty state ─────────────────────────────── */
+.menu-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+}
+
+.menu-empty .icon {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 14px;
+  opacity: 0.7;
+}
+
+.menu-empty strong {
+  display: block;
+  color: var(--text);
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+
+.menu-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--muted);
+  padding: 40px;
+}
+
+@media (max-width: 900px) {
+  .menu { padding: 40px 20px 60px; }
+  .menu h1 { font-size: 32px; }
+  .menu-grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,26 @@
+# ── Secrets — NEVER commit ──────────────────────────────
+# backend/.env holds a live MongoDB Atlas URI and JWT_SECRET.
+# Committing it would leak both. Set these as Environment Variables
+# on the host instead (see the deploy steps).
+backend/.env
+.env
+*.env
+
+# ── Dependencies ─────────────────────────────────────────
+node_modules/
+
+# ── Runtime uploads ──────────────────────────────────────
+# Product images uploaded from the admin panel. The folder is
+# recreated automatically at startup, so it does not need to be tracked.
+backend/uploads/
+
+# ── Generated artifacts from an unrelated project (5+ MB) ─
+docgen/fixmate.html
+docgen/fixmate.txt
+docgen/extract.js
+
+# ── OS / editor noise ────────────────────────────────────
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.log

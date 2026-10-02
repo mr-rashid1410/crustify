@@ -1,0 +1,164 @@
+/* ─────────────────────────────────────────────
+   confirmed.css  —  Order confirmation / receipt
+   ───────────────────────────────────────────── */
+
+.confirm-container {
+  max-width: 1000px;
+  margin: 60px auto;
+  padding: 0 24px;
+}
+
+/* ── Success banner ── */
+.success {
+  text-align: center;
+  margin-bottom: 44px;
+}
+
+.check {
+  width: 68px;
+  height: 68px;
+  background: var(--success);
+  border-radius: 50%;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  box-shadow: 0 0 24px rgba(74, 222, 128, 0.3);
+}
+
+.success h1 {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.success p {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* ── Two-column details ── */
+.details {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+.summary,
+.address {
+  background: var(--surface);
+  padding: 30px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-soft);
+}
+
+.summary {
+  flex: 2;
+}
+
+.address {
+  flex: 1;
+}
+
+.summary h2,
+.address h2 {
+  font-size: 17px;
+  margin: 0 0 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.3px;
+}
+
+/* ── Order items ── */
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.item:last-of-type {
+  border-bottom: none;
+}
+
+/* ── Totals breakdown ── */
+.totals {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.totals p {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--faint);
+  font-size: 14px;
+  padding: 7px 0;
+  margin: 0;
+}
+
+.totals p span { color: var(--muted); }
+
+.totals h3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  padding-top: 14px;
+  margin: 10px 0 0;
+  border-top: 1px solid var(--border);
+}
+
+.totals h3 span { color: var(--accent); }
+
+/* ── Delivery address details ── */
+.address p {
+  color: var(--muted);
+  font-size: 14px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-soft);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.address p strong {
+  color: var(--faint);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.address p span {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.address button {
+  margin-top: 26px;
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--accent-deep), var(--accent));
+  border: none;
+  color: #1a1206;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.address button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px var(--accent-glow);
+}
+
+@media (max-width: 900px) {
+  .details { flex-direction: column; }
+  .summary, .address { width: 100%; }
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cart | Crustify</title>
+  <link rel="stylesheet" href="../css/home.css">
+  <link rel="stylesheet" href="../css/cart.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar"></div>
+
+  <section class="cart-section">
+    <h1>Your Cart</h1>
+
+    <!-- Column labels — hidden when the cart is empty -->
+    <div class="cart-header" id="cartHeader">
+      <span>Product</span>
+      <span>Quantity</span>
+      <span>Subtotal</span>
+      <span class="col-remove">Remove</span>
+    </div>
+
+    <!-- Rows, or the empty-cart message -->
+    <div id="cartItems"></div>
+
+    <!-- Totals + checkout — hidden when the cart is empty -->
+    <div class="cart-total" id="cartSummary">
+      <div class="cart-total-box">
+        <p>Subtotal <span id="subTotal">₹0</span></p>
+        <p>Tax (9%) <span id="tax">₹0</span></p>
+        <h2>Total <span id="grandTotal">₹0</span></h2>
+        <a href="order.html" class="checkout-btn">Proceed to Checkout</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- config.js first, then cart.js -->
+  <script src="../javaScript/config.js"></script>
+  <script src="../javaScript/cart.js"></script>
+
+  <!-- Navbar load -->
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("navbar").innerHTML = data;
+        updateNavbar();
+      });
+  </script>
+
+</body>
+</html>

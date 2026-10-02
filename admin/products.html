@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Products | Crustify Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="has-sidebar">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h2>🔥 Crustify</h2>
+      <p>Admin Panel</p>
+    </div>
+    <nav>
+      <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+      <a href="products.html" class="active"><span class="icon">🍕</span> Products</a>
+      <a href="categories.html"><span class="icon">🏷️</span> Categories</a>
+      <a href="orders.html"><span class="icon">📦</span> Orders</a>
+      <a href="users.html"><span class="icon">👥</span> Users</a>
+      <a href="contacts.html"><span class="icon">✉️</span> Enquiries</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a onclick="adminLogout()">🚪 Logout</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <h1 class="page-title">Products</h1>
+    <p class="page-subtitle">Manage the pizza menu — add, edit or delete items</p>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>All Products</h3>
+        <button class="btn btn-primary" onclick="openAddModal()">+ Add Product</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Popular</th>
+              <th>Available</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsBody">
+            <tr><td colspan="7" style="color:#666;text-align:center;padding:20px;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add / Edit Modal -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal">
+      <h3 id="modalTitle">Add Product</h3>
+
+      <input type="hidden" id="editId">
+
+      <div class="form-group">
+        <label>Item Name *</label>
+        <input type="text" id="pName" placeholder="e.g. Margherita">
+      </div>
+      <div class="form-group">
+        <label>Description *</label>
+        <textarea id="pDesc" placeholder="Short description..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Price (₹) *</label>
+        <input type="number" id="pPrice" placeholder="e.g. 249">
+      </div>
+      <div class="form-group">
+        <label>Image *</label>
+
+        <div class="img-picker">
+          <img id="pImagePreview" class="img-preview" alt="Image preview" hidden>
+
+          <div class="img-picker-body">
+            <!-- Primary: pick a file, it is uploaded to the backend -->
+            <input type="file" id="pImageFile"
+                   accept="image/jpeg,image/png,image/webp,image/gif,image/avif">
+
+            <small class="hint">JPG, PNG, WEBP, GIF or AVIF &middot; max 5 MB</small>
+
+            <!-- Fallback: an existing hosted URL or a user/images filename -->
+            <input type="text" id="pImage" class="img-alt"
+                   placeholder="...or paste an image URL / filename">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Category * <small style="color:#666">(manage these from the Categories tab)</small></label>
+        <select id="pCategory">
+          <option value="">Loading categories...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="pPopular" style="width:auto;margin-right:6px;">
+          Mark as Popular
+        </label>
+      </div>
+
+      <div id="modalMsg" style="color:#ff6b6b;font-size:13px;min-height:18px;"></div>
+
+      <div class="modal-footer">
+        <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="saveBtn" onclick="saveProduct()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    requireAdmin();
+
+    let products   = [];
+    let categories = [];
+
+    // Object URL for the locally-selected file preview, so we can revoke it
+    let previewUrl  = null;
+
+    // ── Image picker ──────────────────────────────────────────────────
+    function clearPreview() {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        previewUrl = null;
+      }
+      document.getElementById("pImagePreview").hidden = true;
+      document.getElementById("pImagePreview").removeAttribute("src");
+    }
+
+    // Shows a thumbnail in the form. `src` may be a local blob or an
+    // already-saved image value resolved through adminProductImage().
+    function showPreview(src) {
+      clearPreview();
+      const img = document.getElementById("pImagePreview");
+      img.src = src;
+      img.hidden = false;
+    }
+
+    // Preview the file the moment it is picked, before uploading
+    document.getElementById("pImageFile").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return clearPreview();
+
+      previewUrl = URL.createObjectURL(file);
+      const img = document.getElementById("pImagePreview");
+      img.src = previewUrl;
+      img.hidden = false;
+    });
+
+    // Reflect a saved image value in the picker
+    function syncPreviewFromValue(value) {
+      if (value) showPreview(adminProductImage(value));
+      else clearPreview();
+    }
+
+    // ── Load all products ──────────────────────────────────────────────
+    async function loadProducts() {
+      const tbody = document.getElementById("productsBody");
+      try {
+        const res  = await fetch(`${API_URL}/products/admin/all`, { headers: adminHeaders() });
+        const data = await res.json();
+
+        if (!res.ok) {
+          tbody.innerHTML = `<tr><td colspan="7" style="color:#ff6b6b;">Error: ${data.message || "Could not load products"}</td></tr>`;
+          return;
+        }
+
+        products = data;
+        renderProducts();
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="color:#ff6b6b;">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    // ── Render product rows ────────────────────────────────────────────
+    function renderProducts() {
+      const tbody = document.getElementById("productsBody");
+
+      if (products.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="color:#666;text-align:center;padding:20px;">No products found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = products.map(p => {
+        const cat = categories.find(c => c.name === p.category);
+        return `
+          <tr>
+            <td>
+              <img class="product-img"
+                src="${adminProductImage(p.image)}"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                alt="${p.name}">
+              <span style="display:none;width:44px;height:44px;background:#222;border-radius:6px;align-items:center;justify-content:center;color:#555;font-size:18px;">🍽️</span>
+            </td>
+            <td style="color:#fff;font-weight:500;">${p.name}</td>
+            <td>
+              <span class="badge ${cat && cat.isDefault ? 'badge-default' : 'badge-cat'}">
+                ${p.category || "—"}
+              </span>
+            </td>
+            <td style="color:#e74c3c;font-weight:bold;">₹${p.price}</td>
+            <td style="color:${p.isPopular ? '#f1c40f' : '#444'};">${p.isPopular ? "⭐ Yes" : "—"}</td>
+            <td>
+              <span class="badge ${p.isAvailable ? 'badge-confirmed' : 'badge-cancelled'}">
+                ${p.isAvailable ? "Yes" : "No"}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-edit btn-sm" onclick="openEditModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">Edit</button>
+              <button class="btn btn-delete btn-sm" style="margin-left:6px;" onclick="deleteProduct('${p._id}', '${p.name}')">Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // ── Load categories into the form dropdown ─────────────────────────
+    async function loadCategories() {
+      const select = document.getElementById("pCategory");
+      try {
+        const res  = await fetch(`${API_URL}/categories`, { headers: adminHeaders() });
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.message || "Could not load categories");
+
+        categories = data;
+
+        const keep = select.value;
+        select.innerHTML = categories.length
+          ? categories.map(c =>
+              `<option value="${c.name}">${c.name}${c.isDefault ? " (default)" : ""}</option>`
+            ).join("")
+          : `<option value="">No categories available</option>`;
+
+        if (keep) select.value = keep;
+
+        // Badges depend on which category is the default
+        if (products.length) renderProducts();
+
+      } catch {
+        categories = [];
+        select.innerHTML = `<option value="">Could not load categories</option>`;
+      }
+    }
+
+    // Keep a product's current category selectable even if it is no
+    // longer in the list, so editing the product cannot fail
+    function ensureCategoryOption(value) {
+      const select = document.getElementById("pCategory");
+      if (!value) return;
+      if ([...select.options].some(o => o.value === value)) return;
+
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = value;
+      select.appendChild(opt);
+    }
+
+    // ── Modal helpers ──────────────────────────────────────────────────
+    function openAddModal() {
+      const select = document.getElementById("pCategory");
+      const fallback = (categories.find(c => c.isDefault) || categories[0] || {}).name || "";
+
+      document.getElementById("modalTitle").textContent = "Add Product";
+      document.getElementById("editId").value   = "";
+      document.getElementById("pName").value    = "";
+      document.getElementById("pDesc").value    = "";
+      document.getElementById("pPrice").value   = "";
+      document.getElementById("pImage").value   = "";
+      document.getElementById("pImageFile").value = "";
+      clearPreview();
+      select.value = fallback;
+      document.getElementById("pPopular").checked = false;
+      document.getElementById("modalMsg").textContent = "";
+      document.getElementById("productModal").classList.add("open");
+    }
+
+    function openEditModal(p) {
+      ensureCategoryOption(p.category);
+
+      document.getElementById("modalTitle").textContent = "Edit Product";
+      document.getElementById("editId").value   = p._id;
+      document.getElementById("pName").value    = p.name;
+      document.getElementById("pDesc").value    = p.description;
+      document.getElementById("pPrice").value   = p.price;
+      document.getElementById("pImage").value   = p.image;
+      document.getElementById("pImageFile").value = "";
+      syncPreviewFromValue(p.image);
+      document.getElementById("pCategory").value = p.category || "";
+      document.getElementById("pPopular").checked = p.isPopular;
+      document.getElementById("modalMsg").textContent = "";
+      document.getElementById("productModal").classList.add("open");
+    }
+
+    function closeModal() {
+      document.getElementById("productModal").classList.remove("open");
+    }
+
+    // ── Save product (add or edit) ─────────────────────────────────────
+    async function saveProduct() {
+      const id        = document.getElementById("editId").value;
+      const fileInput = document.getElementById("pImageFile");
+      const file      = fileInput.files[0];
+      const msgEl     = document.getElementById("modalMsg");
+      const saveBtn   = document.getElementById("saveBtn");
+
+      // A file chosen in the picker always wins over the text field
+      const typedImage = document.getElementById("pImage").value.trim();
+
+      if (!document.getElementById("pName").value.trim() ||
+          !document.getElementById("pDesc").value.trim() ||
+          !document.getElementById("pPrice").value ||
+          !document.getElementById("pCategory").value) {
+        msgEl.textContent = "Please fill all required fields.";
+        return;
+      }
+
+      if (!file && !typedImage) {
+        msgEl.textContent = "Please choose an image file or paste an image URL.";
+        return;
+      }
+
+      const body = {
+        name:        document.getElementById("pName").value.trim(),
+        description: document.getElementById("pDesc").value.trim(),
+        price:       Number(document.getElementById("pPrice").value),
+        category:    document.getElementById("pCategory").value,
+        isPopular:   document.getElementById("pPopular").checked,
+      };
+
+      saveBtn.disabled = true;
+
+      try {
+        // 1. Upload the image first, if one was picked
+        if (file) {
+          saveBtn.textContent = "Uploading...";
+          body.image = await uploadProductImage(file);
+        } else {
+          body.image = typedImage;
+        }
+
+        // 2. Then create/update the product with the stored image value
+        const url    = id ? `${API_URL}/products/${id}` : `${API_URL}/products`;
+        const method = id ? "PUT" : "POST";
+
+        const res  = await fetch(url, {
+          method,
+          headers: adminHeaders(),
+          body:    JSON.stringify(body),
+        });
+        const data = await res.json();
+
+        if (!res.ok) { msgEl.textContent = data.message; return; }
+
+        closeModal();
+        showToast(id ? "Product updated!" : "Product added!", "success");
+        loadProducts();
+
+      } catch (err) {
+        msgEl.textContent = err.message || "Something went wrong.";
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save";
+      }
+    }
+
+    // ── Delete product ─────────────────────────────────────────────────
+    async function deleteProduct(id, name) {
+      if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+
+      try {
+        const res = await fetch(`${API_URL}/products/${id}`, {
+          method:  "DELETE",
+          headers: adminHeaders(),
+        });
+        const data = await res.json();
+
+        if (!res.ok) { showToast(data.message, "error"); return; }
+
+        showToast("Product deleted!", "success");
+        loadProducts();
+
+      } catch (err) {
+        showToast("Error: " + err.message, "error");
+      }
+    }
+
+    loadCategories();
+    loadProducts();
+  </script>
+
+</body>
+</html>

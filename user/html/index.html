@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Crustify — Online Food Delivery</title>
+    <meta
+      name="description"
+      content="Crustify delivers stone-baked pizza, flame-grilled burgers, sandwiches, shawarma and more."
+    />
+    <link rel="stylesheet" href="../css/home.css" />
+  </head>
+  <body>
+    <!-- Navbar load here -->
+    <div id="navbar"></div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-text">
+        <span class="hero-eyebrow">Online Food Delivery</span>
+
+        <h1>Every craving,<br /><em>crustified.</em></h1>
+
+        <p>
+          Stone-baked pizza, flame-grilled burgers, loaded wraps and
+          proper shawarma — cooked to order and delivered while it's
+          still hot.
+        </p>
+
+        <div class="hero-actions">
+          <a href="menu.html" class="btn">Order Now</a>
+          <a href="about.html" class="btn btn-ghost">Our Story</a>
+        </div>
+
+        <div class="hero-stats">
+          <div><strong>7</strong><span>Cuisines</span></div>
+          <div><strong>30 min</strong><span>Average delivery</span></div>
+          <div><strong>4.8★</strong><span>Customer rating</span></div>
+        </div>
+      </div>
+
+      <div class="hero-image">
+        <img
+          src="https://images.unsplash.com/photo-1594007654729-407eedc4be65?w=760&h=760&fit=crop&auto=format&q=80"
+          alt="A freshly baked pizza"
+          onerror="this.src='../images/pizza_banner.png'"
+        />
+      </div>
+    </section>
+
+    <!-- Feature strip -->
+    <section class="feature-strip">
+      <div class="feature">
+        <span class="icon">🔥</span>
+        <h3>Cooked to Order</h3>
+        <p>Nothing sits under a heat lamp. Your food hits the grill the moment you order.</p>
+      </div>
+      <div class="feature">
+        <span class="icon">🛵</span>
+        <h3>Fast Delivery</h3>
+        <p>Average door time of 30 minutes, tracked from kitchen to doorstep.</p>
+      </div>
+      <div class="feature">
+        <span class="icon">🌿</span>
+        <h3>Fresh Ingredients</h3>
+        <p>Produce bought daily and dough proved for 24 hours before it ever meets the oven.</p>
+      </div>
+    </section>
+
+    <!-- config.js provides API_URL, isLoggedIn(), updateNavbar() -->
+    <script src="../javaScript/config.js"></script>
+    <script>
+      fetch("navbar.html")
+        .then((response) => response.text())
+        .then((data) => {
+          document.getElementById("navbar").innerHTML = data;
+          updateNavbar();
+        });
+    </script>
+  </body>
+</html>

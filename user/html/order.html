@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order | Crustify</title>
+  <link rel="stylesheet" href="../css/home.css">
+  <link rel="stylesheet" href="../css/order.css">
+</head>
+<body>
+
+  <div id="navbar"></div>
+
+  <section class="order-page">
+    <h1>Checkout</h1>
+
+    <div class="order-container">
+      <!-- Billing Details -->
+      <div class="billing">
+        <h2>Billing Details</h2>
+
+        <input type="text"  id="name"    placeholder="Full Name">
+
+        <div class="bill-div">
+          <input type="email" id="email"   placeholder="Email">
+          <input type="tel"   id="phone"   placeholder="Mob No.">
+        </div>
+
+        <input type="text"  id="address" placeholder="Address">
+
+        <div class="bill-div">
+          <input type="text" id="city"    placeholder="City">
+          <input type="text" id="pincode" placeholder="Pin Code">
+        </div>
+
+        <button id="placeOrder">PLACE ORDER</button>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="summary">
+        <h2>Your Order</h2>
+        <div id="orderItems"></div>
+        <p>Subtotal: <span id="subtotal">₹0</span></p>
+        <p>Tax (9%): <span id="tax">₹0</span></p>
+        <h3>Total: <span id="total">₹0</span></h3>
+      </div>
+    </div>
+  </section>
+
+  <!-- config.js must load before order.js -->
+  <script src="../javaScript/config.js"></script>
+  <script src="../javaScript/order.js"></script>
+
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("navbar").innerHTML = data;
+        updateNavbar();
+      });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Users | Crustify Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="has-sidebar">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h2>🔥 Crustify</h2>
+      <p>Admin Panel</p>
+    </div>
+    <nav>
+      <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+      <a href="products.html"><span class="icon">🍕</span> Products</a>
+      <a href="categories.html"><span class="icon">🏷️</span> Categories</a>
+      <a href="orders.html"><span class="icon">📦</span> Orders</a>
+      <a href="users.html" class="active"><span class="icon">👥</span> Users</a>
+      <a href="contacts.html"><span class="icon">✉️</span> Enquiries</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a onclick="adminLogout()">🚪 Logout</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <h1 class="page-title">Users</h1>
+    <p class="page-subtitle">All registered customer accounts</p>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>All Users</h3>
+        <input class="search-input" id="searchInput" type="text" placeholder="Search by name or email...">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody">
+            <tr><td colspan="5" style="color:#666;text-align:center;padding:20px;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script>
+    requireAdmin();
+
+    let allUsers = [];
+
+    async function loadUsers() {
+      const tbody = document.getElementById("usersBody");
+      try {
+        const res = await fetch(`${API_URL}/orders/admin/users`, { headers: adminHeaders() });
+        allUsers  = await res.json();
+
+        if (!res.ok || allUsers.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="color:#666;text-align:center;padding:20px;">No users found.</td></tr>`;
+          return;
+        }
+
+        renderUsers(allUsers);
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color:#ff6b6b;">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderUsers(users) {
+      const tbody = document.getElementById("usersBody");
+      tbody.innerHTML = users.map((u, i) => `
+        <tr>
+          <td style="color:#666;">${i + 1}</td>
+          <td style="color:#fff;font-weight:500;">${u.name}</td>
+          <td style="color:#aaa;">${u.email}</td>
+          <td>
+            <span class="badge badge-${u.role}">${u.role}</span>
+          </td>
+          <td style="color:#666;">
+            ${new Date(u.createdAt).toLocaleDateString("en-IN", {
+              day: "numeric", month: "short", year: "numeric"
+            })}
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        const q = e.target.value.toLowerCase();
+        const filtered = allUsers.filter(u =>
+          u.name.toLowerCase().includes(q) ||
+          u.email.toLowerCase().includes(q)
+        );
+        renderUsers(filtered);
+      });
+    });
+
+    loadUsers();
+  </script>
+
+</body>
+</html>

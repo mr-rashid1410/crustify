@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register | Crustify</title>
+  <link rel="stylesheet" href="../css/home.css">
+  <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar"></div>
+
+  <section class="auth-section">
+    <div class="auth-box">
+
+      <h2>Create Account 🍕</h2>
+      <p class="subtitle">Join Crustify and order your favourites</p>
+
+      <!-- Error / Success message -->
+      <div class="msg-box" id="msgBox"></div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="John Doe" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="you@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="At least 6 characters" required>
+        </div>
+
+        <button type="submit" class="auth-btn" id="regBtn">Create Account</button>
+      </form>
+
+      <hr class="divider">
+
+      <p class="auth-footer">
+        Already have an account? <a href="login.html">Login here</a>
+      </p>
+
+    </div>
+  </section>
+
+  <!-- Navbar load -->
+  <script src="../javaScript/config.js"></script>
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("navbar").innerHTML = data;
+        updateNavbar();
+      });
+
+    // If already logged in, go to menu
+    if (isLoggedIn()) {
+      window.location.href = "menu.html";
+    }
+
+    // Remove any stale token from previous session when visiting register page
+    // (user explicitly chose to register a new account)
+
+    const form   = document.getElementById("registerForm");
+    const msgBox = document.getElementById("msgBox");
+    const btn    = document.getElementById("regBtn");
+
+    function showMsg(text, type) {
+      msgBox.textContent = text;
+      msgBox.className   = `msg-box ${type} show`;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      btn.disabled    = true;
+      btn.textContent = "Creating account...";
+
+      const name     = document.getElementById("name").value.trim();
+      const email    = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (password.length < 6) {
+        showMsg("Password must be at least 6 characters", "error");
+        btn.disabled    = false;
+        btn.textContent = "Create Account";
+        return;
+      }
+
+      try {
+        const res  = await fetch(`${API_URL}/auth/register`, {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ name, email, password }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showMsg(data.message, "error");
+          btn.disabled    = false;
+          btn.textContent = "Create Account";
+          return;
+        }
+
+        // Save token and user
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user",  JSON.stringify(data.user));
+
+        showMsg("Account created! Please login to continue.", "success");
+
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 1200);
+
+      } catch (err) {
+        showMsg("Network error. Is the server running?", "error");
+        btn.disabled    = false;
+        btn.textContent = "Create Account";
+      }
+    });
+  </script>
+
+</body>
+</html>

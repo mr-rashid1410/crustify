@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Menu | Crustify</title>
+  <link rel="stylesheet" href="../css/menu.css">
+  <link rel="stylesheet" href="../css/home.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar"></div>
+
+  <!-- Menu Section -->
+  <section class="menu">
+    <div class="section-heading menu-heading">
+      <h1>Our Menu</h1>
+      <p>Stone-baked pizza, flame-grilled burgers, wraps and more</p>
+    </div>
+
+    <!-- Category filter — chips are built from the categories collection -->
+    <div class="category-filter" id="categoryFilter"></div>
+
+    <!-- Products are rendered here dynamically by menu.js -->
+    <div class="menu-grid" id="menuGrid">
+      <p class="menu-loading">Loading menu...</p>
+    </div>
+  </section>
+
+  <!-- config.js must load before menu.js -->
+  <script src="../javaScript/config.js"></script>
+  <script src="../javaScript/menu.js"></script>
+
+  <!-- Navbar load -->
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("navbar").innerHTML = data;
+        updateNavbar();
+        updateCartBadge();
+      });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login | Crustify</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <div class="admin-login-wrap">
+    <div class="admin-login-box">
+      <h2>🍕 Admin Panel</h2>
+      <p>Sign in with your admin credentials</p>
+
+      <div id="msg"></div>
+
+      <input type="email"    id="email"    placeholder="Admin Email">
+      <input type="password" id="password" placeholder="Password">
+      <button id="loginBtn" onclick="doLogin()">Sign In</button>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    // If already logged in as admin, go to dashboard
+    if (isAdminLoggedIn()) {
+      window.location.href = "dashboard.html";
+    }
+
+    async function doLogin() {
+      const email    = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const btn      = document.getElementById("loginBtn");
+      const msg      = document.getElementById("msg");
+
+      msg.className = "";
+      msg.textContent = "";
+
+      if (!email || !password) {
+        msg.className   = "msg error";
+        msg.textContent = "Please enter email and password.";
+        return;
+      }
+
+      btn.disabled    = true;
+      btn.textContent = "Signing in...";
+
+      try {
+        const res  = await fetch(`${API_URL}/auth/login`, {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ email, password }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          msg.className   = "msg error";
+          msg.textContent = data.message;
+          btn.disabled    = false;
+          btn.textContent = "Sign In";
+          return;
+        }
+
+        if (data.user.role !== "admin") {
+          msg.className   = "msg error";
+          msg.textContent = "Access denied. This account is not an admin.";
+          btn.disabled    = false;
+          btn.textContent = "Sign In";
+          return;
+        }
+
+        // Save admin credentials
+        localStorage.setItem("adminToken", data.token);
+        localStorage.setItem("adminUser",  JSON.stringify(data.user));
+
+        msg.className   = "msg success";
+        msg.textContent = "Login successful! Redirecting...";
+
+        setTimeout(() => window.location.href = "dashboard.html", 700);
+
+      } catch (err) {
+        msg.className   = "msg error";
+        msg.textContent = "Network error. Is the server running?";
+        btn.disabled    = false;
+        btn.textContent = "Sign In";
+      }
+    }
+
+    // Allow pressing Enter to submit
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") doLogin();
+    });
+  </script>
+
+</body>
+</html>
