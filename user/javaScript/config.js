@@ -5,7 +5,8 @@
 //  Include this script FIRST in every HTML page.
 // ─────────────────────────────────────────────
 
-const API_URL = "http://localhost:5000/api";
+// const API_URL = "http://localhost:5000/api";
+const API_URL = "https://crustify.onrender.com/api";
 
 // Where the bundled fallback photos live, relative to html/
 const LOCAL_IMAGE_DIR = "../images/";
